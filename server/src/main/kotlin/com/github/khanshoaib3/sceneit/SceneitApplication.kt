@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController
 @SpringBootApplication
 @RestController
 class SceneitApplication {
-    @GetMapping("/hello")
-    fun hello(@RequestParam(value = "name", defaultValue = "World") name: String?): String {
-        return String.format("Hello %s!", name)
+    @GetMapping("/")
+    fun root(): String {
+        return String.format("Server for scene-it.")
     }
 }
 
