@@ -1,8 +1,7 @@
 package com.github.khanshoaib3.sceneit.security.services
 
-import com.github.khanshoaib3.sceneit.BusinessExceptions
-import com.github.khanshoaib3.sceneit.UserRepository
-import com.github.khanshoaib3.sceneit.toUserDetail
+import com.github.khanshoaib3.sceneit.controller.BusinessExceptions
+import com.github.khanshoaib3.sceneit.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 

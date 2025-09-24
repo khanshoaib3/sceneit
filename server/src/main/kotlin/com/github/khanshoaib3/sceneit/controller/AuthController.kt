@@ -1,13 +1,23 @@
-package com.github.khanshoaib3.sceneit
+package com.github.khanshoaib3.sceneit.controller
 
+import com.github.khanshoaib3.sceneit.security.services.UserDetailsImpl
+import com.github.khanshoaib3.sceneit.model.UserEntity
+import com.github.khanshoaib3.sceneit.repository.UserRepository
+import com.github.khanshoaib3.sceneit.security.jwt.JwtUtils
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+
 
 data class RegisterCredentials(
     val username: String,
@@ -18,6 +28,13 @@ data class RegisterCredentials(
 data class LoginCredentials(
     val username: String,
     val password: String,
+)
+
+data class JwtResponse(
+    val jwt: String,
+    val username: String,
+    val email: String?,
+    val role: String,
 )
 
 data class ApiResponse(val status: Int, val message: String)
@@ -34,6 +51,8 @@ sealed class BusinessExceptions(val httpStatus: HttpStatus, override val message
 class AuthController(
     private val userRepository: UserRepository,
     private val passwordEncoder: BCryptPasswordEncoder,
+    private val authenticationManager: AuthenticationManager,
+    private val jwtUtils: JwtUtils,
 ) {
     @PostMapping("/register")
     fun register(@Valid @RequestBody credentials: UserEntity): ResponseEntity<Any> {
@@ -56,18 +75,29 @@ class AuthController(
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody credentials: LoginCredentials): ResponseEntity<ApiResponse> {
-        val userEntity = userRepository.findByUsername(credentials.username)
-            ?: throw BusinessExceptions.UsernameNotFoundException()
-        if (passwordEncoder.matches(
-                credentials.password,
-                userEntity.password
-            )
-        ) return ResponseEntity.status(HttpStatus.ACCEPTED)
-            .body(ApiResponse(HttpStatus.ACCEPTED.value(), "TODO Send JWT token"))
+    fun login(@Valid @RequestBody loginRequest: LoginCredentials): ResponseEntity<JwtResponse> {
+        try {
+            val authentication: Authentication = authenticationManager
+                .authenticate(UsernamePasswordAuthenticationToken(loginRequest.username, loginRequest.password))
 
-        throw BusinessExceptions.PasswordIncorrectException()
+            SecurityContextHolder.getContext().authentication = authentication
+            val jwt: String = jwtUtils.generateJwtToken(authentication)
+
+            val userDetails = authentication.principal as UserDetailsImpl
+
+            return ResponseEntity.ok(
+                JwtResponse(
+                    jwt = jwt,
+                    username = userDetails.getUsername(),
+                    email = userDetails.getEmail(),
+                    role = userDetails.getRole().name
+                )
+            )
+        } catch (ex: BadCredentialsException) {
+            throw BusinessExceptions.PasswordIncorrectException()
+        }
     }
+
     // info
     // update
     // delete

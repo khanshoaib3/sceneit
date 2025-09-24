@@ -1,7 +1,7 @@
-package com.github.khanshoaib3.sceneit.security
+package com.github.khanshoaib3.sceneit
 
-import com.github.khanshoaib3.sceneit.ApiResponse
-import com.github.khanshoaib3.sceneit.BusinessExceptions
+import com.github.khanshoaib3.sceneit.controller.ApiResponse
+import com.github.khanshoaib3.sceneit.controller.BusinessExceptions
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException

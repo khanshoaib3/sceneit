@@ -1,4 +1,4 @@
-package com.github.khanshoaib3.sceneit
+package com.github.khanshoaib3.sceneit.model
 
 import jakarta.persistence.*
 import jakarta.validation.constraints.Email

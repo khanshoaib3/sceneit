@@ -1,5 +1,6 @@
-package com.github.khanshoaib3.sceneit
+package com.github.khanshoaib3.sceneit.repository
 
+import com.github.khanshoaib3.sceneit.model.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
 public interface UserRepository : JpaRepository<UserEntity, Long> {
