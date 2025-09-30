@@ -17,7 +17,7 @@ import io.jsonwebtoken.UnsupportedJwtException
 
 
 // TODO Move this to application.properties
-private const val jwtExpirationMs: Long =259200000
+private const val jwtExpirationMs: Long = 259200000
 
 // Ref: https://github.com/jwtk/jjwt?tab=readme-ov-file#quickstart
 class JwtUtils {

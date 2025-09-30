@@ -4,7 +4,11 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.io.Serializable
+import java.time.Instant
 
 /*
 sealed interface AuthRole {
@@ -16,6 +20,7 @@ sealed interface AuthRole {
 enum class AuthRole { USER, ADMIN }
 
 @Entity
+@EntityListeners(AuditingEntityListener::class)
 @Table(
     name = "users",
     uniqueConstraints = [
@@ -41,6 +46,14 @@ class UserEntity : Serializable {
 
     @Enumerated(EnumType.STRING)
     var role: AuthRole = AuthRole.USER
+
+    @CreatedDate
+    @Column(name = "created_at")
+    var createdAt: Instant? = null
+
+    @LastModifiedDate
+    @Column(name = "last_modified_at")
+    var lastModifiedAt: Instant? = null
 
     constructor(username: String, password: String, email: String? = null) {
         this.username = username
