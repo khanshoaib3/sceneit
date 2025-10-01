@@ -63,7 +63,7 @@ class UserEntity : Serializable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true // Compare reference
-        if (id != null || other !is UserEntity) return false
+        if (id == null || other !is UserEntity) return false
         return id == other.id
     }
 
