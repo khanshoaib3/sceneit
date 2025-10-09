@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import java.rmi.UnexpectedException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -35,6 +36,15 @@ class GlobalExceptionHandler {
         val response = MessageResponse(
             message = errors
         )
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
+    }
+
+    @ExceptionHandler(UnexpectedException::class)
+    fun handleUnexpectedException(ex: UnexpectedException): ResponseEntity<MessageResponse> {
+        val response = MessageResponse(
+            message = ex.message ?: "An unexpected exception occurred"
+        )
+        ex.printStackTrace()
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
     }
 }

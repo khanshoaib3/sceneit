@@ -8,37 +8,12 @@ import org.hibernate.annotations.OnDeleteAction
 import java.io.Serializable
 import java.time.Instant
 
-
 enum class MediaType {
     MOVIE, TV_SERIES, ANIME, MANGA, BOOK, GAME
 }
 
 enum class MediaSourceType {
     TMDB, IGDB, MY_ANIME_LIST
-}
-
-data class WatchTimestamps(
-    val startTimestamp: Instant?,
-    val completedTimestamp: Instant?,
-)
-
-@Converter(autoApply = true)
-class WatchTimestampsConverter : AttributeConverter<WatchTimestamps?, String?> {
-    override fun convertToDatabaseColumn(watchTimestamps: WatchTimestamps?): String? {
-        if (watchTimestamps == null) return null
-        if (watchTimestamps.startTimestamp == null && watchTimestamps.completedTimestamp == null) return null
-        return "${watchTimestamps.startTimestamp?.toString() ?: "null"}||${watchTimestamps.completedTimestamp?.toString() ?: "null"}"
-    }
-
-    override fun convertToEntityAttribute(s: String?): WatchTimestamps? {
-        if (s.isNullOrBlank()) return null
-        val timestampsInString = s.split("||")
-        if (timestampsInString.size != 2) return null
-        return WatchTimestamps(
-            startTimestamp = if (timestampsInString[0] == "null") null else Instant.parse(timestampsInString[0]),
-            completedTimestamp = if (timestampsInString[1] == "null") null else Instant.parse(timestampsInString[1])
-        )
-    }
 }
 
 @Entity
@@ -61,14 +36,14 @@ class MediaEntity : Serializable {
 
     var imageUrl: String? = null
 
+    @Enumerated(EnumType.STRING)
     var sourceType: MediaSourceType? = null
 
     var sourceId: String? = null
 
     @NotNull
     @ElementCollection
-    @Convert(converter = WatchTimestampsConverter::class)
-    lateinit var watchTimes: MutableSet<WatchTimestamps>
+    lateinit var completionTimestamps: MutableSet<Instant>
 
     @ManyToMany
     @JoinTable(
@@ -82,19 +57,19 @@ class MediaEntity : Serializable {
         user: UserEntity,
         title: String,
         type: MediaType,
+        completionTimestamps: MutableSet<Instant> = mutableSetOf(),
         imageUrl: String? = null,
+        collections: MutableSet<CollectionEntity> = mutableSetOf(),
         sourceType: MediaSourceType? = null,
         sourceId: String? = null,
-        watchTimes: MutableSet<WatchTimestamps> = mutableSetOf(),
-        collections: MutableSet<CollectionEntity> = mutableSetOf(),
     ) {
         this.user = user
         this.title = title
         this.type = type
+        this.completionTimestamps = completionTimestamps
         this.imageUrl = imageUrl
+        this.collections = collections
         this.sourceType = sourceType
         this.sourceId = sourceId
-        this.watchTimes = watchTimes
-        this.collections = collections
     }
 }

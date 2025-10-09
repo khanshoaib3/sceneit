@@ -9,4 +9,7 @@ sealed class BusinessExceptions(val httpStatus: HttpStatus, override val message
     class EmailExistException() : BusinessExceptions(HttpStatus.CONFLICT, "Email already exists.")
     class PasswordIncorrectException() : BusinessExceptions(HttpStatus.UNAUTHORIZED, "Password is incorrect.")
     class SamePasswordException(): BusinessExceptions(HttpStatus.BAD_REQUEST, message = "New password cannot be the old password.")
+
+    class InvalidTimestamp(): BusinessExceptions(HttpStatus.BAD_REQUEST, message = "Invalid timestamp provided")
+    class InvalidMediaId(): BusinessExceptions(HttpStatus.BAD_REQUEST, message = "Invalid media id provided")
 }
